@@ -9,11 +9,9 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandStadiaController;
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
@@ -24,13 +22,16 @@ public class AlignToReefTagRelative extends Command {
   private CommandSwerveDrivetrain drivebase;
   private SwerveRequest.FieldCentricFacingAngle drive;
   private double tagID = -1;
-
+  private final SwerveRequest.FieldCentricFacingAngle robotDrive ;
   public AlignToReefTagRelative(boolean isRightScore, CommandSwerveDrivetrain drivebase) {
+    
     xController = new PIDController(Constants.X_REEF_ALIGNMENT_P, 0.0, 0);  // Vertical movement
     yController = new PIDController(Constants.Y_REEF_ALIGNMENT_P, 0.0, 0);  // Horitontal movement
     rotController = new PIDController(Constants.ROT_REEF_ALIGNMENT_P, 0, 0);  // Rotation
     this.isRightScore = isRightScore;
     this.drivebase = drivebase;
+     robotDrive= new SwerveRequest.FieldCentricFacingAngle();
+
     addRequirements(drivebase);
   }
 
@@ -66,7 +67,7 @@ public class AlignToReefTagRelative extends Command {
       double ySpeed = -yController.calculate(postions[0]);
       double rotValue = -rotController.calculate(postions[4]);
 
-    drivebase.setControl(drive
+    drivebase.setControl(robotDrive
           .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)
           .withVelocityX(xSpeed) // Drive forward with negative Y(forward)
           .withVelocityY(ySpeed) // Drive left with negative X (left)
@@ -92,7 +93,7 @@ public class AlignToReefTagRelative extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    drivebase.setControl(drive
+    drivebase.setControl(robotDrive
           .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)
           .withVelocityX(0) // Drive forward with negative Y(forward)
           .withVelocityY(0) // Drive left with negative X (left)
